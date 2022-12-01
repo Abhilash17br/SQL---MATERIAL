@@ -3,7 +3,7 @@ show databases
 create database if not exists ineuron_fsda
 use ineuron_fsda
 
-create table if not exists bank_details(
+create table if not exists bank_details( age int,
 job varchar(30),
 marital varchar(30),
 education varchar(30),
