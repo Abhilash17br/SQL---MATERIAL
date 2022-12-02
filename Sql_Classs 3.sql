@@ -180,9 +180,12 @@ alter table sales add column discount_flag varchar(10)
 update sales set discount_flag = if(discount>0, 'yes','no')
 select discount_flag ,count(*) from sales group by discount_flag
 
+#or
 select count(*) from sales where discount > 0
 select count(*) from sales where discount = 0
 
+# or
+select count(*) from sales group by discount>0
 
 # TASK
 # UPLOAD THE GIVEN DATA.- 
