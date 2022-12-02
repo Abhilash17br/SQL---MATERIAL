@@ -1,4 +1,13 @@
-# Partition..
+# SQL-CLASS7 -- PARTITION BY RANGE, PARTITION BY HASH, PARTITION BY KEY,PARTITION BY LIST, PARTITION BY RANGE COLUMNS, PARTITION BY LIST COLUMNS,
+
+# PARTITION ON INT VALUES...
+# PARTITION BY RANGE- partition based on specified range, PARTITION BY HASH -partition based on hashing logic, PARTITION BY KEY - partition based on md5 algo,PARTITION BY LIST- partition based on list of int values specified.
+
+# PARTITION ON COLUMN DATA. VARCHAR OR STR..
+# PARTITION BY RANGE COLUMNS- partition based on values less than list of values in a tuple. , PARTITION BY LIST COLUMNS - partition based on list of values in given list.
+
+# PARTITION INSIDE A PARTITION - SUBPARTITION.
+# FOR DETAILED EXPLANATION -- https://dev.mysql.com/doc/mysql-partitioning-excerpt/8.0/en/partitioning-types.html
 
 create database ineuron_partition
 use  ineuron_partition
@@ -242,7 +251,7 @@ insert into ineuron_course7 values('machine_learning' , 101 , 'ML', "this is ML 
 select partition_name, table_name, table_rows from  information_schema.partitions where table_name = "ineuron_course7"
 
 # range column partititon - can do partition by range of diff columns.
-
+# REFER THIS LINK FOR DETAILED EXPLANATION - https://dev.mysql.com/doc/mysql-partitioning-excerpt/8.0/en/partitioning-columns-range.html
 create table ineuron_course8(
 course_name varchar(50) ,
 course_id int,
@@ -396,4 +405,22 @@ select partition_name, table_name, table_rows from  information_schema.partition
 
 select * from ineuron_course11
 
-
+# or 
+CREATE TABLE ts (id INT, purchased DATE)
+    PARTITION BY RANGE( YEAR(purchased) )
+    SUBPARTITION BY HASH( TO_DAYS(purchased) ) (
+        PARTITION p0 VALUES LESS THAN (1990) (
+            SUBPARTITION s0,
+            SUBPARTITION s1
+        ),
+        PARTITION p1 VALUES LESS THAN (2000) (
+            SUBPARTITION s2,
+            SUBPARTITION s3
+        ),
+        PARTITION p2 VALUES LESS THAN MAXVALUE (
+            SUBPARTITION s4,
+            SUBPARTITION s5
+        )
+    );
+    
+select partition_name, table_name, table_rows from  information_schema.partitions where table_name = "ts"
