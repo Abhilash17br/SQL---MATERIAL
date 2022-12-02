@@ -29,7 +29,7 @@ insert into students_ineuron values(101,"FSDA", "test@gmail.com" ,"active", 05)
 # error @ inserting above line, as tables are related by course_id foreign key looks for any course_id1 value that is inserted
 # here with the reference or parent table, if no match found then, it gives error,.
 # this is the kind of restriction , the forein key put on while inserting data.
-
+# STUDENT_INEURON CAN CONTAIN ONLY RECORDS OF COURSE_ID THAT ARE PRESENT IN INEURON. 
 insert into students_ineuron values(101,"FSDA", "test@gmail.com" ,"active", 01)
 # works for above table, as 01 value is available in course_id . 
 
@@ -119,7 +119,7 @@ insert into child values (1,1)
 select * from child
 
 set sql_safe_updates = 0
-insert into child values (1,2) # not able to add the entry , some error.
+insert into child values (1,2) # not able to add the entry , as 2 is not available under id of parent table.
 delete from parent where id =1 # not able to delete due to error, if entry here is deleted then relationship would be broken..
 delete from child where id =1 # works
 select * from child 
@@ -148,7 +148,7 @@ select * from child # automatically deleated all the values "1" that parent_id h
 # child table can only have primary keys that are present in parent key, as value from parent key is deleted , the value gets deleted in child as well.
 # it doesnt allow this operation as seeen above, but allows because of cascade option.
 
-update parent set id = 3 where id =2 # doesnot work, so 
+update parent set id = 3 where id =2 # doesnot work, child table has values taken from parent table.so 
 
 drop table child # dropping child table and creating new..
 
@@ -162,9 +162,13 @@ insert into child values (1,1),(1,2),(3,2),(2,2)
 
 update parent set id = 3 where id =2
 select * from child
-
+# here we are changing values in parent table so that values in child table also changes.
+# as child table can only have those values of parent_id that are in id column of parent.
 # in above we have updated values of id from 2 to 3, so value gets updated in child as well, due to "on update cascade" command.
 
+update child set id =2 where id = 3
+select * from parent
+# it works in other way around also, updating in child must update values in parent as well.
 
 create table child1(
 id int,
@@ -172,7 +176,3 @@ parent_id int,
 foreign key (parent_id) references parent(id) on update cascade on delete cascade)
 
 # can create with both options enabled.
-
-
-
-
