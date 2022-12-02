@@ -1,3 +1,4 @@
+# SQL-CLASS 6 -- WINDOWING FUNCTION - RANK, ROW_NUMBER, DENSE RANK
 # Windowing Function.. 
 # works on subset of the dataset, i,e it creates a group and performs operation on those groups.
 
@@ -210,11 +211,3 @@ rank() over(partition by student_batch ,student_stream order by students_marks d
 row_number() over(partition by student_batch ,student_stream order by students_marks desc) as "row_num", 
 dense_rank() over(partition by student_batch ,student_stream order by students_marks desc) as "dense_ran" 
 from ineuron_students
-
-
-
-
-
-
-
-
