@@ -38,6 +38,11 @@ IGNORE 1 ROWS;
 
 # AUTO INCREMENT CONSTRAINT.
 
+# characteristics of primary key
+The PRIMARY KEY constraint uniquely identifies each record in a table. 
+Primary keys must contain UNIQUE values, and cannot contain NULL values. 
+A table can have only ONE primary key; and in the table, this primary key can consist of single or multiple columns (fields).
+
 create table if not exists test (
 test_id int auto_increment,
 test_name varchar(30),
@@ -200,3 +205,31 @@ select * from test10
 # in the above example i have added the test_id to be 400, 
 # now again i have inserted record after that, but tes_id for this new inserted record doesnot start at 401,
 # instead it next highest number form test_id column.
+
+
+create table if not exists final(
+test_id int not null auto_increment,
+test_name varchar(30) unique not null,
+test_adress varchar(30) not null default 'unknown',
+test_salary int check(test_salary>0),
+primary key (test_id))
+
+insert into final (test_name,test_adress,test_salary) values('abhilash','bangalore',10)
+insert into final (test_name,test_salary) values('subham',10)
+insert into final (test_name,test_adress,test_salary) values('kakashi','mumbai',10)
+insert into final (test_id,test_name,test_adress,test_salary) values(5,'kakazu','mumbai',100)
+insert into final (test_name,test_salary) values('naruto',10)
+select * from final
+
+alter table final add column test_balance int
+alter table final add check (test_balance > 0)
+alter table final modify column test_balance integer Not null; #doesnot work as table already has few null recorsd for test_balance.
+
+alter table final add column test_check varchar(50)
+alter table final modify column test_check varchar(50) not null #doesnot work as table already has few null recorsd for test_check.
+
+# not null constraint can be done on test_salary
+alter table final modify column test_salary int not null; 
+
+select * from final
+
