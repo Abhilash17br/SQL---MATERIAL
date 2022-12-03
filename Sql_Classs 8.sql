@@ -70,6 +70,50 @@ cross join student s
 
 
 # indexing..
+# reference link - https://dataschool.com/sql-optimization/how-indexing-works/
+
+Types of Indexing
+There are two types of databases indexes:
+
+Clustered
+Non-clustered
+
+Both clustered and non-clustered indexes are stored and searched as B-trees, a data structure similar to a binary tree. 
+A B-tree is a “self-balancing tree data structure that maintains sorted data and allows searches, sequential access, insertions, and deletions in logarithmic time.” 
+Basically it creates a tree-like structure that sorts data for quick searching.
+
+Clustered Indexes
+Clustered indexes are the unique index per table that uses the primary key to organize the data that is within the table.
+The clustered index ensures that the primary key is stored in increasing order, which is also the order the table holds in memory.
+Clustered indexes do not have to be explicitly declared.
+Created when the table is created.
+Use the primary key sorted in ascending order.
+Creating Clustered Indexes
+The clustered index will be automatically created when the primary key is defined:
+CREATE TABLE friends (id INT PRIMARY KEY, name VARCHAR, city VARCHAR);
+When searching the table by “id”, the ascending order of the column allows for optimal searches to be performed.
+Since the numbers are ordered, the search can navigate the B-tree allowing searches to happen in logarithmic time.
+However, in order to search for the “name” or “city” in the table, we would have to look at every entry because these columns do not have an index.
+This is where non-clustered indexes become very useful.
+
+Non-Clustered Indexes
+Non-clustered indexes are sorted references for a specific field, from the main table, that hold pointers back to the original entries of the table.
+They are used to increase the speed of queries on the table by creating columns that are more easily searchable.
+Non-clustered indexes can be created by data analysts/ developers after a table has been created and filled.
+Note: Non-clustered indexes are not new tables.
+Non-clustered indexes hold the field that they are responsible for sorting and a pointer from each of those entries back to the full entry in the table.
+
+You can think of these just like indexes in a book. The index points to the location in the book where you can find the data you are looking for.
+
+To create an index to sort our friends’ names alphabetically:
+CREATE INDEX friends_name_asc ON friends(name ASC);
+
+Searching Indexes
+After your non-clustered indexes are created you can begin querying with them.
+Indexes use an optimal search method known as binary search. Binary searches work by constantly cutting the data in half 
+and checking if the entry you are searching for comes before or after the entry in the middle of the current portion of data.
+This works well with B-trees because they are designed to start at the middle entry; to search for the entries within the tree 
+you know the entries down the left path will be smaller or before the current entry and the entries to the right will be larger or after the current entry.
 
 create table if not exists course1 (
 course_id int,
@@ -102,6 +146,19 @@ show index from course1
 # Also, commands like insert , update, delete can be an burden to indexing @ the same time, when an record is updated or deleted or inserted,
 # the brinary tree has to updated every time.
 
+explain analyze select * from course1 where course_id = 109;
+
+# or it can be created as follows
+create table if not exists course8 (
+course_id int,
+course_name varchar(50),
+course_desc varchar(60),
+course_tag varchar(50))
+
+create index index_course_id on course8(course_id);
+show index from course8
+desc course8 ;
+
 #indexing on multiple tables.
 create table if not exists course2(
 course_id int,
@@ -111,6 +168,7 @@ course_tag varchar(50),
 index(course_id,course_name))
 
 show index from course2
+desc course2
 
 insert into course2 values(101 , 'fsda' , 'full stack data analytics' , 'Analytics'),
 (102 , 'fsds' , 'full stack data analytics' , 'Analytics'),
@@ -127,8 +185,7 @@ insert into course2 values(101 , 'fsda' , 'full stack data analytics' , 'Analyti
 select * from course2
 
 select * from course2 where course_id = 106
-explain select * from course2 where course_id = 106
-analyze table course2
+explain analyze select * from course2 where course_id = 106
 
 create table if not exists course3(
 course_id int,
@@ -137,11 +194,33 @@ course_desc varchar(60),
 course_tag varchar(50),
 unique index(course_desc))   # creates binary tree on basis of unique data.
 
-# regular indexing operation includes duplicates also to create binary tree.
-
 show index from course3
 
+SQL Server unique index overview
+A unique index ensures the index key columns do not contain any duplicate values.
+A unique index may consist of one or many columns. If a unique index has one column, the values in this column will be unique.
+In case the unique index has multiple columns, the combination of values in these columns is unique
+Any attempt to insert or update data into the unique index key columns that causes the duplicate will result in an error.
+
+A unique index can be clustered or non-clustered.
+To create a unique index, you use the CREATE UNIQUE INDEX statement as follows:
+CREATE UNIQUE INDEX index_name
+ON table_name(column_list);
+
+In this syntax:
+First, specify the name of the unique index after the CREATE UNIQUE INDEX keywords.
+Second, specify the name of the table to which the index associated and a list of columns that will be included in the index.
+
+
+# QUERY TO CHECK DUPLICATES IN A COLUMN- METHOD 1
+SELECT `COLUMN_NAME`,IF(COUNT(`COLUMN_NAME`)>1,"DUPLI","NODUPLI") AS DUPLI_FLAG FROM SALES GROUP BY `COLUMN_NAME`
+SELECT DUPLI_FLAG,COUNT(DUPLI_FLAG) FROM ( SELECT `COLUMN_NAME`,IF(COUNT(`COLUMN_NAME`)>1,"DUPLI","NODUPLI") AS DUPLI_FLAG FROM SALES GROUP BY `COLUMN_NAME`) AS TEST GROUP BY DUPLI_FLAG
+# QUERY TO CHECK DUPLICATES IN A COLUMN- METHOD 2
+SELECT `COLUMN_NAME`, COUNT(`COLUMN_NAME`) FROM SALES GROUP BY `COLUMN_NAME` HAVING COUNT(`COLUMN_NAME`)>1
+
+
 # union
+++-
 # union tries to remove any duplicate entries.
 select * from course
 select * from student
@@ -206,9 +285,3 @@ with recursive cte as
 union all
 select n+1,p+2,q-2 from cte where n<5) # performs operation 4 times , ie < 5.
 select * from cte
-
-
-
-
-
-
